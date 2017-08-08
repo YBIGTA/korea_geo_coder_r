@@ -15,6 +15,8 @@ toSido <- function(siDoShorcut) {
     return('제주특별자치도')
   } else if (siDoShorcut == '세종'){
     return('세종특별시')
+  } else if (siDoShorcut == '광주'){
+    return('광주광역시')
   } else if (siDoShorcut == '경기'){
     return('경기도')
   } else if (siDoShorcut == '강원'){
