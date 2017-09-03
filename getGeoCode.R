@@ -1,5 +1,7 @@
-getGeoCode<-function(siDo = "", siGu = "", gu= "", dong ="", road = "", building_code = "", building_second_code = ""){
-  con <- dbConnect(RSQLite::SQLite(), dbname="./address.sqlite")
+source('./properties.R')
+
+getGeoCode<-function(siDo = "", siGu = "", gu= "", dong ="", road = "", buildRepNum = "", buildingLeapNum = ""){
+  con <- dbConnect(RSQLite::SQLite(), dbname=dbPath)
 
   cleanVal <- function(val){
     val <- trimws(val)
@@ -21,40 +23,43 @@ getGeoCode<-function(siDo = "", siGu = "", gu= "", dong ="", road = "", building
   gu <- cleanVal(gu)
   dong <- cleanVal(dong)
   road <- cleanVal(road)
-  building_code <- cleanVal(building_code)
-  building_second_code <- cleanVal(building_second_code)
+  buildRepNum <- cleanVal(buildRepNum)
+  buildingLeapNum <- cleanVal(buildingLeapNum)
 
-  candiQueries <- data.frame(query = c(
-    buildQuery(siDo, siGu, gu, dong, road, building_code, building_second_code),
-    buildQuery(siDo, siGu, gu, dong, road, '', ''),
-    buildQuery(siDo, siGu,'', dong, road, building_code, building_second_code),
-    buildQuery(siDo, siGu,'', dong, road, '', ''),
-    buildQuery(siDo, '', gu, dong, road, building_code, building_second_code),
-    buildQuery(siDo, '', gu, dong, road,'',''),
-    buildQuery(siDo, '', '', dong, road, building_code, building_second_code),
-    buildQuery(siDo, '', '', dong, road,'',''),
-    buildQuery(siDo, '', '', '', road, building_code, building_second_code),
-    buildQuery(siDo, '', '', '', road,'',''),
-    buildQuery(siDo, siGu, gu, '', road, building_code, building_second_code),
-    buildQuery(siDo, siGu, gu, '', road,'',''),
-    buildQuery(siDo, siGu, '', '', road, building_code, building_second_code),
-    buildQuery(siDo, siGu, '', '', road,'',''),
-    buildQuery(siDo, '', gu, '', road, building_code, building_second_code),
-    buildQuery(siDo, '', gu, '', road,'',''),
-    buildQuery(siDo, siGu, gu, dong, '','',''),
-    buildQuery(siDo, siGu, '', dong, '','',''),
-    buildQuery(siDo, '', gu, dong, '','',''),
-    buildQuery(siDo, '', '', dong, '','',''),
-    buildQuery(siDo, siGu, gu, '', '','',''),
-    buildQuery(siDo, siGu, '', '', '','',''),
-    buildQuery(siDo, '', gu, '', '','','')
-  )
+  candiQueries <- data.frame(
+    query = c(
+      buildQuery(siDo, siGu, gu, dong, road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, siGu, gu, dong, road, '', ''),
+      buildQuery(siDo, siGu,'', dong, road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, siGu,'', dong, road, '', ''),
+      buildQuery(siDo, '', gu, dong, road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, '', gu, dong, road,'',''),
+      buildQuery(siDo, '', '', dong, road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, '', '', dong, road,'',''),
+      buildQuery(siDo, '', '', '', road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, '', '', '', road,'',''),
+      buildQuery(siDo, siGu, gu, '', road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, siGu, gu, '', road,'',''),
+      buildQuery(siDo, siGu, '', '', road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, siGu, '', '', road,'',''),
+      buildQuery(siDo, '', gu, '', road, buildRepNum, buildingLeapNum),
+      buildQuery(siDo, '', gu, '', road,'',''),
+      buildQuery(siDo, siGu, gu, dong, '','',''),
+      buildQuery(siDo, siGu, '', dong, '','',''),
+      buildQuery(siDo, '', gu, dong, '','',''),
+      buildQuery(siDo, '', '', dong, '','',''),
+      buildQuery(siDo, siGu, gu, '', '','',''),
+      buildQuery(siDo, siGu, '', '', '','',''),
+      buildQuery(siDo, '', gu, '', '','','')
+    )
   ) %>% filter(query != "") %>% unique()
   for(query in candiQueries$query){
-     geoCodes<-dbGetQuery(con, query)
+    geoCodes<-dbGetQuery(con, query)
+    print(query)
     if(nrow(geoCodes) == 0) next
-    ss<-geoCodes %>% filter(is.numeric(X) & is.numeric(Y)) %>% summarise(avgX = mean(X), avgY = mean(Y))
-    return(data.frame(E = ss$avgX, N = ss$avgY))
+    print(query)
+    ss<-geoCodes %>% filter(is.numeric(e) & is.numeric(n)) %>% summarise(avgE = mean(e), avgN = mean(n))
+    return(data.frame(e = ss$avgE, n = ss$avgN))
   }
-  return(data.frame(E = NA, N = NA))
+  return(data.frame(e = NA, n = NA))
 }

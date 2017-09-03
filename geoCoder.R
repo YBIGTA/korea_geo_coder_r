@@ -1,6 +1,7 @@
 library("RSQLite")
 library(dplyr)
-con <- dbConnect(RSQLite::SQLite(), dbname="./address.sqlite")
+source('./properties.R')
+con <- dbConnect(RSQLite::SQLite(), dbname=dbPath)
 
 source('./toSido.R')
 source('./queryBuilder.R')
